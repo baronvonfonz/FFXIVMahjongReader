@@ -11,10 +11,6 @@ namespace MahjongReader
         private string mjaiNotation;
 
         public TileTexture(string iTextureId, string iMjaiNotation) {
-            if (string.IsNullOrEmpty(textureId) || string.IsNullOrEmpty(mjaiNotation))  {
-                 throw new ArgumentNullException(nameof(textureId), "Input string cannot be null or empty.");
-            }
-
             textureId = iTextureId;
             mjaiNotation = iMjaiNotation;
         }
@@ -68,7 +64,6 @@ namespace MahjongReader
                 map.Add(fullTextureId, new TileTexture(fullTextureId, i.ToString() + "z"));
             }
 
-            // 
             map.Add("076075", new TileTexture("076075", "0m"));
             map.Add("076076", new TileTexture("076076", "0p"));
             map.Add("076077", new TileTexture("076077", "0s"));
@@ -89,7 +84,14 @@ namespace MahjongReader
                 return null;
             }
 
-            var textureTex = texturePath.Substring(16, 6);
+            var textureTex = texturePath.Substring(15, 6);
+            if (!Map.ContainsKey(textureTex)) {
+#if DEBUG
+                Console.WriteLine("Unknown key: " + texturePath);
+#endif
+                return null;
+            }
+
             return Map[textureTex];
         }
 
@@ -104,16 +106,3 @@ namespace MahjongReader
         }
     }
 }
-
-
-            // these are the important tiles
-            //076075 - 77 aka dora 5
-
-            //076001 one of characters, but not localized
-
-
-            // DUNNO?
-            //076115 5 character aka dora
-            //076116 5 dots aka dora
-            //076117 5 bamboo aka dora
-            //076131 one of characters, localized 3d looking tile
