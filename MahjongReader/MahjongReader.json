@@ -1,0 +1,11 @@
+{
+  "Author": "baronvonfonz",
+  "Name": "Mahjong Reader",
+  "Punchline": "Track your Mahjong games for later review.",
+  "Description": "Track your Mahjong games for later review.",
+  "InternalName": "mahjongReader",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "mahjong"
+  ]
+}
