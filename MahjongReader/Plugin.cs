@@ -1,17 +1,14 @@
-﻿using Dalamud.Game.Command;
-using Dalamud.IoC;
-using Dalamud.Plugin;
+﻿using System;
 using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
-using MahjongReader.Windows;
-using System;
-using System.Runtime.InteropServices;
+using Dalamud.Game.Command;
+using Dalamud.IoC;
+using Dalamud.Plugin;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System.Collections.Generic;
+using MahjongReader.Windows;
 
 namespace MahjongReader
 {
@@ -34,6 +31,7 @@ namespace MahjongReader
         private MainWindow MainWindow { get; init; }
 
         private ImportantPointers ImportantPointers { get; init; }
+        private NodeCrawlerUtils NodeCrawlerUtils { get; init; }
 
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -65,6 +63,7 @@ namespace MahjongReader
 
             AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "Emj", OnAddonPostSetup);
             ImportantPointers = new ImportantPointers();
+            NodeCrawlerUtils = new NodeCrawlerUtils(PluginLog);
         }
 
         public void Dispose()
@@ -95,93 +94,6 @@ namespace MahjongReader
             var prevNode = rootNode->PrevSiblingNode;
         }
 
-        public unsafe void DelveNode(AtkResNode* node, Action<IntPtr>? nodeHandlerFn) {
-            var nodeType = node->Type;
-#if DEBUG
-            PluginLog.Info("NodeID: " + node->NodeID);
-            PluginLog.Info("NodeType: " + nodeType);
-#endif
-
-            if (nodeType == NodeType.Text) {
-                var castedTextNode = (AtkTextNode*)node;
-#if DEBUG
-                PluginLog.Info(castedTextNode->NodeText.ToString());
-#endif
-            } else if (nodeType == NodeType.Image) {
-                var castedImageNode = (AtkImageNode*)node;
-                int partId = castedImageNode->PartId;
-                var partsList = castedImageNode->PartsList;
-                var partsCount = partsList->PartCount;
-
-                if (partId > partsCount) {
-#if DEBUG
-                    PluginLog.Info("Bad parts count for node: " + node->NodeID + " partID: " + partId);
-#endif
-                    return;
-                }
-
-                var uldAsset = partsList->Parts[partId].UldAsset;
-                if (uldAsset->AtkTexture.TextureType != TextureType.Resource) {
-#if DEBUG
-                    PluginLog.Info("Bad texture type for node: " + node->NodeID + " partID: " + partId);
-#endif
-                    return;
-                }
-                var texFileNameStdString = &uldAsset->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName;
-                var texString = texFileNameStdString->Length < 16
-                                    ? Marshal.PtrToStringAnsi((IntPtr)texFileNameStdString->Buffer)
-                                    : Marshal.PtrToStringAnsi((IntPtr)texFileNameStdString->BufferPtr);
-#if DEBUG
-                PluginLog.Info("length " + texFileNameStdString->Length + " texString " + texString);
-#endif
-                if (texString != null) {
-                    var maybeTileTex = TileTextureMap.Instance.GetTileTextureFromTexturePath(texString);
-#if DEBUG
-                    PluginLog.Info("maybeTileTex: " + maybeTileTex?.ToString() ?? "whiffed?");
-#endif
-                }
-            } else if ((ushort)nodeType > 999) {
-                DelveComponentNode(node, nodeHandlerFn);
-            }
-        }
-
-        public unsafe void TraverseAllAtkResNodes(AtkResNode* node, Action<IntPtr>? nodeHandlerFn) {
-            if (node == null) {
-                return;
-            }
-
-#if DEBUG
-            PluginLog.Info("START TOP OF A NODE TREE");
-#endif
-
-            var childPtr = node->ChildNode;
-
-            while (childPtr != null) {
-                DelveNode(childPtr, nodeHandlerFn);
-                nodeHandlerFn?.Invoke((nint)childPtr);
-                childPtr = childPtr->PrevSiblingNode;
-                TraverseAllAtkResNodes(childPtr, nodeHandlerFn);
-            }
-#if DEBUG
-            PluginLog.Info("END NODE TREE");
-#endif
-        }
-
-        private unsafe void DelveComponentNode(AtkResNode* node, Action<IntPtr>? nodeHandlerFn) {
-            var compNode = (AtkComponentNode*)node;
-            var componentInfo = compNode->Component->UldManager;
-            var childCount = componentInfo.NodeListCount;
-
-            var objectInfo = (AtkUldComponentInfo*)componentInfo.Objects;
-            if (objectInfo == null)
-            {
-                return;
-            }
-            for (var i = 0; i < childCount; i++) {
-                DelveNode(compNode->Component->UldManager.NodeList[i], nodeHandlerFn);
-            }
-        }
-
         private unsafe void OnCommand(string command, string args)
         {
             var addonPtr = GameGui.GetAddonByName("Emj", 1);
@@ -195,13 +107,13 @@ namespace MahjongReader
             ImportantPointers.WipePointers();
             var addon = (AtkUnitBase*)addonPtr;
             var rootNode = addon->RootNode;
-            TraverseAllAtkResNodes(rootNode, (intPtr) => ImportantPointers.MaybeTrackPointer(intPtr));
+            NodeCrawlerUtils.TraverseAllAtkResNodes(rootNode, (intPtr) => ImportantPointers.MaybeTrackPointer(intPtr));
             
             PluginLog.Info("Hand size: " + ImportantPointers.PlayerHand.Count);
             ImportantPointers.PlayerHand.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
-                PluginLog.Info("Hand: " + castedPtr->NodeID);
-                // DelveNode(, (_) => {});
+                var tileTexture = NodeCrawlerUtils.GetTileTextureFromComponentNode(ptr);
+                PluginLog.Info(tileTexture?.ToString() ?? "whiff");
             });
         }
 
