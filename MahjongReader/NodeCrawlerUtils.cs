@@ -37,10 +37,6 @@ namespace MahjongReader
 
         public unsafe void DelveNode(AtkResNode* node, Action<IntPtr>? nodeHandlerFn) {
             var nodeType = node->Type;
-#if DEBUG
-            PluginLog.Info("NodeID: " + node->NodeID);
-            PluginLog.Info("NodeType: " + nodeType);
-#endif
 
             if (nodeType == NodeType.Text) {
                 var castedTextNode = (AtkTextNode*)node;
@@ -54,31 +50,19 @@ namespace MahjongReader
                 var partsCount = partsList->PartCount;
 
                 if (partId > partsCount) {
-#if DEBUG
-                    PluginLog.Info("Bad parts count for node: " + node->NodeID + " partID: " + partId);
-#endif
                     return;
                 }
 
                 var uldAsset = partsList->Parts[partId].UldAsset;
                 if (uldAsset->AtkTexture.TextureType != TextureType.Resource) {
-#if DEBUG
-                    PluginLog.Info("Bad texture type for node: " + node->NodeID + " partID: " + partId);
-#endif
                     return;
                 }
                 var texFileNameStdString = &uldAsset->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName;
                 var texString = texFileNameStdString->Length < 16
                                     ? Marshal.PtrToStringAnsi((IntPtr)texFileNameStdString->Buffer)
                                     : Marshal.PtrToStringAnsi((IntPtr)texFileNameStdString->BufferPtr);
-#if DEBUG
-                PluginLog.Info("length " + texFileNameStdString->Length + " texString " + texString);
-#endif
                 if (texString != null) {
                     var maybeTileTex = TileTextureMap.Instance.GetTileTextureFromTexturePath(texString);
-#if DEBUG
-                    PluginLog.Info("maybeTileTex: " + maybeTileTex?.ToString() ?? "whiffed?");
-#endif
                 }
             } else if ((ushort)nodeType > 999) {
                 DelveComponentNode(node, nodeHandlerFn);
@@ -90,10 +74,6 @@ namespace MahjongReader
                 return;
             }
 
-#if DEBUG
-            PluginLog.Info("START TOP OF A NODE TREE");
-#endif
-
             var childPtr = node->ChildNode;
 
             while (childPtr != null) {
@@ -102,9 +82,6 @@ namespace MahjongReader
                 childPtr = childPtr->PrevSiblingNode;
                 TraverseAllAtkResNodes(childPtr, nodeHandlerFn);
             }
-#if DEBUG
-            PluginLog.Info("END NODE TREE");
-#endif
         }
 
         private unsafe void DelveComponentNode(AtkResNode* node, Action<IntPtr>? nodeHandlerFn) {
@@ -118,7 +95,6 @@ namespace MahjongReader
                 return;
             }
             for (var i = 0; i < childCount; i++) {
-                PluginLog.Info("nodeId: " + compNode->AtkResNode.NodeID + " child: " + i);
                 DelveNode(compNode->Component->UldManager.NodeList[i], nodeHandlerFn);
             }
         }

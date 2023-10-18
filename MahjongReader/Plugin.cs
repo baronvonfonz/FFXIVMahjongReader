@@ -62,7 +62,7 @@ namespace MahjongReader
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
             AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "Emj", OnAddonPostSetup);
-            ImportantPointers = new ImportantPointers();
+            ImportantPointers = new ImportantPointers(PluginLog);
             NodeCrawlerUtils = new NodeCrawlerUtils(PluginLog);
         }
 
