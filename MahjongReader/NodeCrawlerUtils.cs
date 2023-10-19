@@ -23,7 +23,7 @@ namespace MahjongReader
             return texString != null ? TileTextureMap.Instance.GetTileTextureFromTexturePath(texString) : null;
         }
 
-        public unsafe TileTexture? GetTileTextureFromDiscardTile(IntPtr nodePtr) {
+        public unsafe DiscardTile? GetTileTextureFromDiscardTile(IntPtr nodePtr) {
             var compNode = (AtkComponentNode*)nodePtr;
 
             var count = compNode->Component->UldManager.NodeListCount;
@@ -32,7 +32,17 @@ namespace MahjongReader
             var imageNode = compNode->Component->UldManager.NodeList[3];
             var texString = GetImageTexturePath((AtkImageNode*)imageNode);
 
-            return texString != null ? TileTextureMap.Instance.GetTileTextureFromTexturePath(texString) : null;
+            var tileTexture = texString != null ? TileTextureMap.Instance.GetTileTextureFromTexturePath(texString) : null;
+            if (tileTexture == null) {
+                return null;
+            }
+
+            // 2nd node has a -75 -75 GB value when it is used in another player's meld
+            var resNodeForMeldedInfo = compNode->Component->UldManager.NodeList[1];
+            var isMelded = resNodeForMeldedInfo->AddRed == 0 && resNodeForMeldedInfo->AddGreen == -75 && resNodeForMeldedInfo->AddBlue == -75;
+            var isImmediatelyDiscarded = resNodeForMeldedInfo->AddRed == -75 && resNodeForMeldedInfo->AddGreen == -75 && resNodeForMeldedInfo->AddBlue == -75;
+
+            return new DiscardTile(tileTexture, isMelded, isImmediatelyDiscarded);
         }
 
         public unsafe string? GetImageTexturePath(AtkImageNode* imageNode) {

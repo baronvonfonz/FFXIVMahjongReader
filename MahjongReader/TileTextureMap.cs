@@ -6,6 +6,22 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 namespace MahjongReader
 {
+    public class DiscardTile {
+        public TileTexture TileTexture { get; }
+        public bool IsMelded { get; }
+        public bool IsImmediatelyDiscarded { get; }
+
+        public DiscardTile(TileTexture tileTexture, bool isMelded, bool isImmediatelyDiscarded) {
+            TileTexture = tileTexture;
+            IsMelded = isMelded;
+            IsImmediatelyDiscarded = isImmediatelyDiscarded;
+        }
+
+        public override string ToString() {
+            return $"{TileTexture} IsMelded: {IsMelded} IsImmediatelyDiscarded: {IsImmediatelyDiscarded}";
+        }
+    }
+
     public class TileTexture {
         private string textureId;
         private string mjaiNotation;
