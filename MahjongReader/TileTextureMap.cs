@@ -79,17 +79,14 @@ namespace MahjongReader
 
         private const string TEXTURE_PATH_TILE_ICON_PREFIX = "ui/icon/076000/";
 
-        public TileTexture? GetTileTextureFromTexturePath(string texturePath) {
-            if (!texturePath.StartsWith(TEXTURE_PATH_TILE_ICON_PREFIX)) {
-                return null;
-            }
+        public bool IsValidTileTexturePath(string? texturePath) {
+            return texturePath?.StartsWith(TEXTURE_PATH_TILE_ICON_PREFIX) ?? false;
+        }
 
+        public TileTexture GetTileTextureFromTexturePath(string texturePath) {
             var textureTex = texturePath.Substring(15, 6);
             if (!Map.ContainsKey(textureTex)) {
-#if DEBUG
-                Console.WriteLine("Unknown key: " + texturePath);
-#endif
-                return null;
+                throw new ApplicationException("Unknown key: " + texturePath);
             }
 
             return Map[textureTex];
