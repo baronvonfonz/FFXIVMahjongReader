@@ -9,7 +9,7 @@ namespace MahjongReader
     }
 
     public enum MahjongNodeType : ushort {
-        PLAYER_DISCARD_TILE = 1,
+        PLAYER_DISCARD_TILE = 1021,
         LEFT_DISCARD_TILE = 1022,
         FAR_DISCARD_TILE = 1024,
         RIGHT_DISCARD_TILE = 1023,

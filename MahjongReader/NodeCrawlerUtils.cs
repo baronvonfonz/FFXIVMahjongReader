@@ -26,8 +26,6 @@ namespace MahjongReader
         public unsafe DiscardTile? GetTileTextureFromDiscardTile(IntPtr nodePtr) {
             var compNode = (AtkComponentNode*)nodePtr;
 
-            var count = compNode->Component->UldManager.NodeListCount;
-
             // no button wrapper, fourth node is always the image
             var imageNode = compNode->Component->UldManager.NodeList[3];
             var texString = GetImageTexturePath((AtkImageNode*)imageNode);
@@ -37,10 +35,21 @@ namespace MahjongReader
                 return null;
             }
 
-            // 2nd node has a -75 -75 GB value when it is used in another player's meld
             var resNodeForMeldedInfo = compNode->Component->UldManager.NodeList[1];
-            var isMelded = resNodeForMeldedInfo->AddRed == 0 && resNodeForMeldedInfo->AddGreen == -75 && resNodeForMeldedInfo->AddBlue == -75;
-            var isImmediatelyDiscarded = resNodeForMeldedInfo->AddRed == -75 && resNodeForMeldedInfo->AddGreen == -75 && resNodeForMeldedInfo->AddBlue == -75;
+            var addRedInt = resNodeForMeldedInfo->AddRed;
+            var addGreenInt = resNodeForMeldedInfo->AddGreen;
+            // var addBlueInt = resNodeForMeldedInfo->AddBlue; // I think green and blue get same scale in these cases
+
+            bool isMelded = false;
+            bool isImmediatelyDiscarded = false;
+
+            if (addGreenInt < 0 && ((addGreenInt + addRedInt) != addGreenInt * 2)) {
+                isMelded = true;
+            }
+
+            if (addGreenInt < 0 && addGreenInt == addRedInt) {
+                isImmediatelyDiscarded = true;
+            }
 
             return new DiscardTile(tileTexture, isMelded, isImmediatelyDiscarded);
         }
@@ -65,7 +74,7 @@ namespace MahjongReader
 
                 return texturePath;
             } else {
-                PluginLog.Info($"texture not loaded for node ID: {imageNode->AtkResNode.NodeID} ptr = ptr = {(long)imageNode:X}");
+                // PluginLog.Info($"texture not loaded for node ID: {imageNode->AtkResNode.NodeID} ptr = ptr = {(long)imageNode:X}");
                 return null;
             }
         }

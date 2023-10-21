@@ -119,6 +119,15 @@ namespace MahjongReader
                 }
             });
 
+            PluginLog.Info("Player discard size: " + ImportantPointers.PlayerDiscardPile.Count);
+            ImportantPointers.PlayerDiscardPile.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
+                if (tileTexture != null) {
+                    PluginLog.Info(tileTexture.ToString());
+                }
+            });
+
             PluginLog.Info("Right discard size: " + ImportantPointers.RightDiscardPile.Count);
             ImportantPointers.RightDiscardPile.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
