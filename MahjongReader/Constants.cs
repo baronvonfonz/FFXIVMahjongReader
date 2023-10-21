@@ -14,6 +14,8 @@ namespace MahjongReader
         FAR_DISCARD_TILE = 1024,
         RIGHT_DISCARD_TILE = 1023,
         PLAYER_HAND_TILE = 1055,
+
+        LEFT_MELD_TILE = 1057,
     }
 
     public class PlayerHandNodeIds {

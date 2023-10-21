@@ -103,6 +103,7 @@ namespace MahjongReader
                 if (PlayerHandNodeIds.MOST_RECENT_DRAWN == nodeId || PlayerHandNodeIds.PLAYER_HAND_TILE_NODE_IDS.Contains(nodeId)) {
                     playerHand.Add(rawPtr);
                 }
+            // discards
             } else if (nodeTypeUShort == (ushort)MahjongNodeType.PLAYER_DISCARD_TILE) {
                 playerDiscardPile.Add(rawPtr);
             } else if (nodeTypeUShort == (ushort)MahjongNodeType.RIGHT_DISCARD_TILE) {
@@ -111,6 +112,9 @@ namespace MahjongReader
                 leftDiscardPile.Add(rawPtr);
             } else if (nodeTypeUShort == (ushort)MahjongNodeType.FAR_DISCARD_TILE) {
                 farDiscardPile.Add(rawPtr);
+            // melds
+            } else if (nodeTypeUShort == (ushort)MahjongNodeType.LEFT_MELD_TILE) {
+                leftMelds.Add(rawPtr);
             }
         }
     }

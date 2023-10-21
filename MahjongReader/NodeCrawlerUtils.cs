@@ -14,6 +14,9 @@ namespace MahjongReader
 
         public unsafe TileTexture? GetTileTextureFromPlayerHandTile(IntPtr nodePtr) {
             var compNode = (AtkComponentNode*)nodePtr;
+            if (!compNode->AtkResNode.IsVisible) { // previous games have textures lingering in the pointer but not visible
+                return null;
+            }
 
             // button is always first node here
             var buttonNode = compNode->Component->UldManager.NodeList[0];
@@ -25,6 +28,9 @@ namespace MahjongReader
 
         public unsafe DiscardTile? GetTileTextureFromDiscardTile(IntPtr nodePtr) {
             var compNode = (AtkComponentNode*)nodePtr;
+            if (!compNode->AtkResNode.IsVisible) { // previous games have textures lingering in the pointer but not visible
+                return null;
+            }
 
             // no button wrapper, fourth node is always the image
             var imageNode = compNode->Component->UldManager.NodeList[3];
@@ -52,6 +58,22 @@ namespace MahjongReader
             }
 
             return new DiscardTile(tileTexture, isMelded, isImmediatelyDiscarded);
+        }
+
+        public unsafe TileTexture? GetTileTextureFromMeldTile(IntPtr nodePtr) {
+            var compNode = (AtkComponentNode*)nodePtr;
+            if (!compNode->AtkResNode.IsVisible) { // previous games have textures lingering in the pointer but not visible
+                return null;
+            }
+
+            // three nodes, third is the image
+            var tileImageNode = compNode->Component->UldManager.NodeList[2];
+            if (!tileImageNode->IsVisible) { // previous games have textures lingering in the pointer but not visible
+                return null;
+            }
+            var texString = GetImageTexturePath((AtkImageNode*)tileImageNode);
+
+            return texString != null ? TileTextureMap.Instance.GetTileTextureFromTexturePath(texString) : null;
         }
 
         public unsafe string? GetImageTexturePath(AtkImageNode* imageNode) {

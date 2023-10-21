@@ -9,6 +9,7 @@ using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using MahjongReader.Windows;
+using System.Collections.Generic;
 
 namespace MahjongReader
 {
@@ -108,7 +109,7 @@ namespace MahjongReader
             var addon = (AtkUnitBase*)addonPtr;
             var rootNode = addon->RootNode;
             NodeCrawlerUtils.TraverseAllAtkResNodes(rootNode, (intPtr) => ImportantPointers.MaybeTrackPointer(intPtr));
-            
+            var observedTileTextures = new List<TileTexture>();
             PluginLog.Info("Hand size: " + ImportantPointers.PlayerHand.Count);
             ImportantPointers.PlayerHand.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
@@ -116,6 +117,7 @@ namespace MahjongReader
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromPlayerHandTile(ptr);
                 if (tileTexture != null) {
                     PluginLog.Info(tileTexture.ToString());
+                    observedTileTextures.Add(tileTexture);
                 }
             });
 
@@ -125,6 +127,7 @@ namespace MahjongReader
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
                 if (tileTexture != null) {
                     PluginLog.Info(tileTexture.ToString());
+                    observedTileTextures.Add(tileTexture.TileTexture);
                 }
             });
 
@@ -134,6 +137,7 @@ namespace MahjongReader
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
                 if (tileTexture != null) {
                     PluginLog.Info(tileTexture.ToString());
+                    observedTileTextures.Add(tileTexture.TileTexture);
                 }
             });
 
@@ -143,6 +147,7 @@ namespace MahjongReader
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
                 if (tileTexture != null) {
                     PluginLog.Info(tileTexture.ToString());
+                    observedTileTextures.Add(tileTexture.TileTexture);
                 }
             });
 
@@ -152,8 +157,21 @@ namespace MahjongReader
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
                 if (tileTexture != null) {
                     PluginLog.Info(tileTexture.ToString());
+                    observedTileTextures.Add(tileTexture.TileTexture);
                 }
             });
+
+            PluginLog.Info("Left meld size: " + ImportantPointers.LeftMelds.Count);
+            ImportantPointers.LeftMelds.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTexture = NodeCrawlerUtils.GetTileTextureFromMeldTile(ptr);
+                if (tileTexture != null) {
+                    PluginLog.Info(tileTexture.ToString());
+                    observedTileTextures.Add(tileTexture);
+                }
+            });
+
+            PluginLog.Info($"Observed count: {observedTileTextures.Count}");
         }
 
         private void DrawUI()
