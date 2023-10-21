@@ -15,9 +15,10 @@ namespace MahjongReader
         private List<IntPtr> farDiscardPile = new List<IntPtr>();
         private List<IntPtr> leftDiscardPile = new List<IntPtr>();
 
-        private List<IntPtr> rightMelds = new List<IntPtr>();
-        private List<IntPtr> farMelds = new List<IntPtr>();
-        private List<IntPtr> leftMelds = new List<IntPtr>();
+        private List<IntPtr> playerMeldGroups = new List<IntPtr>();
+        private List<IntPtr> rightMeldGroups = new List<IntPtr>();
+        private List<IntPtr> farMeldGroups = new List<IntPtr>();
+        private List<IntPtr> leftMeldGroups = new List<IntPtr>();
 
         public IntPtr TopLevelBoard { get; }
         public List<IntPtr> PlayerHand {
@@ -48,6 +49,13 @@ namespace MahjongReader
             }
         }        
 
+        public List<IntPtr> PlayerMeldGroups {
+            get
+            {
+                return playerMeldGroups;
+            }
+        }
+
         public List<IntPtr> LeftDiscardPile {
             get
             {
@@ -55,24 +63,24 @@ namespace MahjongReader
             }
         }
 
-        public List<IntPtr> RightMelds {
+        public List<IntPtr> RightMeldGroups {
             get
             {
-                return rightMelds;
+                return rightMeldGroups;
             }
         }
 
-        public List<IntPtr> FarMelds {
+        public List<IntPtr> FarMeldGroups {
             get
             {
-                return farMelds;
+                return farMeldGroups;
             }
         }        
 
-        public List<IntPtr> LeftMelds {
+        public List<IntPtr> LeftMeldGroups {
             get
             {
-                return leftMelds;
+                return leftMeldGroups;
             }
         }
         private IPluginLog PluginLog { get; init; }
@@ -90,9 +98,10 @@ namespace MahjongReader
             farDiscardPile = new List<IntPtr>();
             leftDiscardPile = new List<IntPtr>();
 
-            rightMelds = new List<IntPtr>();
-            farMelds = new List<IntPtr>();
-            leftMelds = new List<IntPtr>();
+            playerMeldGroups = new List<IntPtr>();
+            rightMeldGroups = new List<IntPtr>();
+            farMeldGroups = new List<IntPtr>();
+            leftMeldGroups = new List<IntPtr>();
         }
 
         public void MaybeTrackPointer(IntPtr rawPtr) {
@@ -113,8 +122,14 @@ namespace MahjongReader
             } else if (nodeTypeUShort == (ushort)MahjongNodeType.FAR_DISCARD_TILE) {
                 farDiscardPile.Add(rawPtr);
             // melds
-            } else if (nodeTypeUShort == (ushort)MahjongNodeType.LEFT_MELD_TILE) {
-                leftMelds.Add(rawPtr);
+            } else if (nodeTypeUShort == (ushort)MahjongNodeType.PLAYER_MELD_GROUP) {
+                playerMeldGroups.Add(rawPtr);
+            } else if (nodeTypeUShort == (ushort)MahjongNodeType.RIGHT_MELD_GROUP) {
+                rightMeldGroups.Add(rawPtr);
+            } else if (nodeTypeUShort == (ushort)MahjongNodeType.LEFT_MELD_GROUP) {
+                leftMeldGroups.Add(rawPtr);
+            } else if (nodeTypeUShort == (ushort)MahjongNodeType.FAR_MELD_GROUP) {
+                farMeldGroups.Add(rawPtr);
             }
         }
     }

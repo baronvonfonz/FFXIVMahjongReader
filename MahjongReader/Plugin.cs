@@ -110,7 +110,6 @@ namespace MahjongReader
             var rootNode = addon->RootNode;
             NodeCrawlerUtils.TraverseAllAtkResNodes(rootNode, (intPtr) => ImportantPointers.MaybeTrackPointer(intPtr));
             var observedTileTextures = new List<TileTexture>();
-            PluginLog.Info("Hand size: " + ImportantPointers.PlayerHand.Count);
             ImportantPointers.PlayerHand.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 NodeCrawlerUtils.DelveNode(castedPtr, null);
@@ -120,8 +119,13 @@ namespace MahjongReader
                     observedTileTextures.Add(tileTexture);
                 }
             });
+           PluginLog.Info("player melds");
+            ImportantPointers.PlayerMeldGroups.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTextures = NodeCrawlerUtils.GetTileTexturesFromPlayerMeldGroup(ptr);
+                tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
+            });
 
-            PluginLog.Info("Player discard size: " + ImportantPointers.PlayerDiscardPile.Count);
             ImportantPointers.PlayerDiscardPile.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
@@ -131,7 +135,6 @@ namespace MahjongReader
                 }
             });
 
-            PluginLog.Info("Right discard size: " + ImportantPointers.RightDiscardPile.Count);
             ImportantPointers.RightDiscardPile.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
@@ -141,7 +144,6 @@ namespace MahjongReader
                 }
             });
 
-            PluginLog.Info("Far discard size: " + ImportantPointers.FarDiscardPile.Count);
             ImportantPointers.FarDiscardPile.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
@@ -151,7 +153,6 @@ namespace MahjongReader
                 }
             });
 
-            PluginLog.Info("Left discard size: " + ImportantPointers.LeftDiscardPile.Count);
             ImportantPointers.LeftDiscardPile.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
@@ -161,14 +162,10 @@ namespace MahjongReader
                 }
             });
 
-            PluginLog.Info("Left meld size: " + ImportantPointers.LeftMelds.Count);
-            ImportantPointers.LeftMelds.ForEach(ptr => {
+            ImportantPointers.FarMeldGroups.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
-                var tileTexture = NodeCrawlerUtils.GetTileTextureFromMeldTile(ptr);
-                if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
-                    observedTileTextures.Add(tileTexture);
-                }
+                var tileTextures = NodeCrawlerUtils.GetTileTexturesFromMeldGroup(ptr);
+                tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
             });
 
             PluginLog.Info($"Observed count: {observedTileTextures.Count}");

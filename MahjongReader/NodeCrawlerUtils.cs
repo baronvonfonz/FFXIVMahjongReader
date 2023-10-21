@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -20,9 +22,14 @@ namespace MahjongReader
 
             // button is always first node here
             var buttonNode = compNode->Component->UldManager.NodeList[0];
+            if (!buttonNode->IsVisible) { // previous games have textures lingering in the pointer but not visible. also when your hand shifts the texture pointers linger
+                return null;
+            }
             var tileImageNode = buttonNode->GetComponent()->UldManager.NodeList[4];
+            if (!tileImageNode->IsVisible) { // previous games have textures lingering in the pointer but not visible. also when your hand shifts the texture pointers linger
+                return null;
+            }
             var texString = GetImageTexturePath((AtkImageNode*)tileImageNode);
-
             return texString != null ? TileTextureMap.Instance.GetTileTextureFromTexturePath(texString) : null;
         }
 
@@ -34,6 +41,9 @@ namespace MahjongReader
 
             // no button wrapper, fourth node is always the image
             var imageNode = compNode->Component->UldManager.NodeList[3];
+            if (!imageNode->IsVisible) { // previous games have textures lingering in the pointer but not visible
+                return null;
+            }
             var texString = GetImageTexturePath((AtkImageNode*)imageNode);
 
             var tileTexture = texString != null ? TileTextureMap.Instance.GetTileTextureFromTexturePath(texString) : null;
@@ -60,20 +70,56 @@ namespace MahjongReader
             return new DiscardTile(tileTexture, isMelded, isImmediatelyDiscarded);
         }
 
-        public unsafe TileTexture? GetTileTextureFromMeldTile(IntPtr nodePtr) {
+        public unsafe List<TileTexture>? GetTileTexturesFromMeldGroup(IntPtr nodePtr) {
             var compNode = (AtkComponentNode*)nodePtr;
             if (!compNode->AtkResNode.IsVisible) { // previous games have textures lingering in the pointer but not visible
                 return null;
             }
 
-            // three nodes, third is the image
-            var tileImageNode = compNode->Component->UldManager.NodeList[2];
-            if (!tileImageNode->IsVisible) { // previous games have textures lingering in the pointer but not visible
+            var meldTileTextures = new List<TileTexture>();
+            // four child component nodes, each has similar pattern
+            for (var i = 0; i < 4; i ++) {
+                var childMeldComponentNode = compNode->Component->UldManager.NodeList[i];
+                // fourth node is the tile image
+                var tileImageNode = childMeldComponentNode->GetComponent()->UldManager.NodeList[3];
+                if (!tileImageNode->IsVisible) { // previous games have textures lingering in the pointer but not visible
+                    continue;
+                }
+                var texString = GetImageTexturePath((AtkImageNode*)tileImageNode);
+                if (texString != null) {
+                    meldTileTextures.Add(TileTextureMap.Instance.GetTileTextureFromTexturePath(texString));
+                }
+            }
+
+
+            return meldTileTextures.Count > 0 ? meldTileTextures : null;
+        }
+
+        public unsafe List<TileTexture>? GetTileTexturesFromPlayerMeldGroup(IntPtr nodePtr) {
+            var compNode = (AtkComponentNode*)nodePtr;
+            if (!compNode->AtkResNode.IsVisible) { // previous games have textures lingering in the pointer but not visible
                 return null;
             }
-            var texString = GetImageTexturePath((AtkImageNode*)tileImageNode);
 
-            return texString != null ? TileTextureMap.Instance.GetTileTextureFromTexturePath(texString) : null;
+            var meldTileTextures = new List<TileTexture>();
+            // four child component nodes, each has similar pattern
+            for (var i = 0; i < 4; i ++) {
+                var childMeldComponentNode = compNode->Component->UldManager.NodeList[i];
+                // button wrapper
+                var buttonComponentNode = childMeldComponentNode->GetComponent()->UldManager.NodeList[0];
+                // fifth node is the tile image
+                var tileImageNode = buttonComponentNode->GetComponent()->UldManager.NodeList[4];
+                if (!tileImageNode->IsVisible) { // previous games have textures lingering in the pointer but not visible
+                    continue;
+                }
+                var texString = GetImageTexturePath((AtkImageNode*)tileImageNode);
+                if (texString != null) {
+                    meldTileTextures.Add(TileTextureMap.Instance.GetTileTextureFromTexturePath(texString));
+                }
+            }
+
+
+            return meldTileTextures.Count > 0 ? meldTileTextures : null;
         }
 
         public unsafe string? GetImageTexturePath(AtkImageNode* imageNode) {
