@@ -80,8 +80,17 @@ namespace MahjongReader
             this.CommandManager.RemoveHandler(CommandName);
         }
 
-        private void OnAddonPostSetup(AddonEvent type, AddonArgs args) {
+        private unsafe void OnAddonPostSetup(AddonEvent type, AddonArgs args) {
             AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, "Emj", OnAddonPostRefresh);
+            var addonPtr = args.Addon;
+            if (addonPtr == IntPtr.Zero) {
+                PluginLog.Info("Could not find Emj");
+                return;
+            }
+            var addon = (AtkUnitBase*)addonPtr;
+            var rootNode = addon->RootNode;
+            ImportantPointers.WipePointers();
+            NodeCrawlerUtils.TraverseAllAtkResNodes(rootNode, (intPtr) => ImportantPointers.MaybeTrackPointer(intPtr));
         }
 
         private unsafe void OnAddonPostRefresh(AddonEvent type, AddonArgs args) {
@@ -91,9 +100,9 @@ namespace MahjongReader
                 return;
             }
 
-            var addon = (AtkUnitBase*)addonPtr;
-            var rootNode = addon->RootNode;
-            var prevNode = rootNode->PrevSiblingNode;
+            var observedTiles = GetObservedTiles();
+            PluginLog.Info($"tiles count: {observedTiles.Count}");
+            observedTiles.ForEach(tile => PluginLog.Info(tile.ToString()));
         }
 
         private unsafe void OnCommand(string command, string args)
@@ -104,100 +113,53 @@ namespace MahjongReader
                 PluginLog.Info("Could not find Emj");
                 return;
             }
-            // TileTextureMap.PrintTest(PluginLog);
-            PluginLog.Info("Found Emj");
-            ImportantPointers.WipePointers();
-            var addon = (AtkUnitBase*)addonPtr;
-            var rootNode = addon->RootNode;
-            NodeCrawlerUtils.TraverseAllAtkResNodes(rootNode, (intPtr) => ImportantPointers.MaybeTrackPointer(intPtr));
+        }
+
+        private unsafe List<TileTexture> GetObservedTiles() {
             var observedTileTextures = new List<TileTexture>();
-            PluginLog.Info("player hand");
             ImportantPointers.PlayerHand.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
-                NodeCrawlerUtils.DelveNode(castedPtr, null);
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromPlayerHandTile(ptr);
                 if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
                     observedTileTextures.Add(tileTexture);
                 }
             });
         
-            PluginLog.Info("player discards");
-            ImportantPointers.PlayerDiscardPile.ForEach(ptr => {
+            // Discarded tiles have their own node tree shape
+            ImportantPointers.PlayerDiscardPile
+                .Concat(ImportantPointers.RightDiscardPile)
+                .Concat(ImportantPointers.FarDiscardPile)
+                .Concat(ImportantPointers.LeftDiscardPile)
+                .ToList()
+                .ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
                 if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
                     if (!tileTexture.IsMelded) {
                         observedTileTextures.Add(tileTexture.TileTexture);
                     }
                 }
             });
 
-            PluginLog.Info("right discards");
-            ImportantPointers.RightDiscardPile.ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
-                if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
-                    if (!tileTexture.IsMelded) {
-                        observedTileTextures.Add(tileTexture.TileTexture);
-                    }
-                }
-            });
-
-            PluginLog.Info("far discards");
-            ImportantPointers.FarDiscardPile.ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
-                if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
-                    if (!tileTexture.IsMelded) {
-                        observedTileTextures.Add(tileTexture.TileTexture);
-                    }
-                }
-            });
-
-            PluginLog.Info("left discards");
-            ImportantPointers.LeftDiscardPile.ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
-                if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
-                    if (!tileTexture.IsMelded) {
-                        observedTileTextures.Add(tileTexture.TileTexture);
-                    }
-                }
-            });
-
-            PluginLog.Info("player melds");
+            // Player melds have their own shape
             ImportantPointers.PlayerMeldGroups.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTextures = NodeCrawlerUtils.GetTileTexturesFromPlayerMeldGroup(ptr);
-                tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
+                tileTextures?.ForEach(texture => observedTileTextures.Add(texture));
             });
 
-            PluginLog.Info("right melds");
-            ImportantPointers.RightMeldGroups.ForEach(ptr => {
+            // Melds that are not your own have a different node tree shape
+            ImportantPointers.RightMeldGroups
+                .Concat(ImportantPointers.FarMeldGroups)
+                .Concat(ImportantPointers.LeftMeldGroups)
+                .ToList()
+                .ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTextures = NodeCrawlerUtils.GetTileTexturesFromMeldGroup(ptr);
-                tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
+                tileTextures?.ForEach(texture => observedTileTextures.Add(texture));
             });
-
-            PluginLog.Info("far melds");
-            ImportantPointers.FarMeldGroups.ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTextures = NodeCrawlerUtils.GetTileTexturesFromMeldGroup(ptr);
-                tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
-            });
-
-            PluginLog.Info("left melds");
-            ImportantPointers.LeftMeldGroups.ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTextures = NodeCrawlerUtils.GetTileTexturesFromMeldGroup(ptr);
-                tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
-            });
-            PluginLog.Info($"Observed count: {observedTileTextures.Count}");
+            
+            return observedTileTextures;
         }
 
         private void DrawUI()

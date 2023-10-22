@@ -93,6 +93,7 @@ namespace MahjongReader
 
         public static TileTextureMap Instance { get; } = new TileTextureMap();
 
+        // TODO: support traditonal (IRL Mahjong tile face) textures? Same pattern, different texture id offset
         private const string TEXTURE_PATH_TILE_ICON_PREFIX = "ui/icon/076000/";
 
         public bool IsValidTileTexturePath(string? texturePath) {
