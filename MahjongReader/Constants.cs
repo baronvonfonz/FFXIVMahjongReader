@@ -15,7 +15,7 @@ namespace MahjongReader
         RIGHT_DISCARD_TILE = 1023,
         PLAYER_HAND_TILE = 1055,
 
-        PLAYER_MELD_GROUP = 1061,
+        PLAYER_MELD_GROUP = 1060,
         LEFT_MELD_GROUP = 1061,
         RIGHT_MELD_GROUP = 1062,
         FAR_MELD_GROUP = 1063,

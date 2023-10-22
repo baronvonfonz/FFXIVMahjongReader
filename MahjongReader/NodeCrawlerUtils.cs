@@ -97,18 +97,22 @@ namespace MahjongReader
 
         public unsafe List<TileTexture>? GetTileTexturesFromPlayerMeldGroup(IntPtr nodePtr) {
             var compNode = (AtkComponentNode*)nodePtr;
-            if (!compNode->AtkResNode.IsVisible) { // previous games have textures lingering in the pointer but not visible
-                return null;
-            }
-
             var meldTileTextures = new List<TileTexture>();
             // four child component nodes, each has similar pattern
             for (var i = 0; i < 4; i ++) {
                 var childMeldComponentNode = compNode->Component->UldManager.NodeList[i];
-                // button wrapper
+                // base component wrapper
                 var buttonComponentNode = childMeldComponentNode->GetComponent()->UldManager.NodeList[0];
+                var buttonUldManager = buttonComponentNode->GetComponent()->UldManager;
+                if (buttonUldManager.NodeListCount < 4) { 
+                    PluginLog.Info($"Nested meld button with less than four children {buttonComponentNode->NodeID}");
+                    continue;
+                }
+                // if there is no Kan one of the four won't have the same memory shape. Also melded tiles are sideways / have different shape
+                var tileImageNodeIndex = buttonUldManager.NodeListCount == 5 ? 4 : 3;
+
                 // fifth node is the tile image
-                var tileImageNode = buttonComponentNode->GetComponent()->UldManager.NodeList[4];
+                var tileImageNode = buttonComponentNode->GetComponent()->UldManager.NodeList[tileImageNodeIndex];
                 if (!tileImageNode->IsVisible) { // previous games have textures lingering in the pointer but not visible
                     continue;
                 }

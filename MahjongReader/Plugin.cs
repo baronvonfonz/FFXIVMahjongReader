@@ -10,6 +10,7 @@ using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using MahjongReader.Windows;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MahjongReader
 {
@@ -110,6 +111,7 @@ namespace MahjongReader
             var rootNode = addon->RootNode;
             NodeCrawlerUtils.TraverseAllAtkResNodes(rootNode, (intPtr) => ImportantPointers.MaybeTrackPointer(intPtr));
             var observedTileTextures = new List<TileTexture>();
+            PluginLog.Info("player hand");
             ImportantPointers.PlayerHand.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 NodeCrawlerUtils.DelveNode(castedPtr, null);
@@ -119,55 +121,82 @@ namespace MahjongReader
                     observedTileTextures.Add(tileTexture);
                 }
             });
-           PluginLog.Info("player melds");
+        
+            PluginLog.Info("player discards");
+            ImportantPointers.PlayerDiscardPile.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
+                if (tileTexture != null) {
+                    PluginLog.Info(tileTexture.ToString());
+                    if (!tileTexture.IsMelded) {
+                        observedTileTextures.Add(tileTexture.TileTexture);
+                    }
+                }
+            });
+
+            PluginLog.Info("right discards");
+            ImportantPointers.RightDiscardPile.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
+                if (tileTexture != null) {
+                    PluginLog.Info(tileTexture.ToString());
+                    if (!tileTexture.IsMelded) {
+                        observedTileTextures.Add(tileTexture.TileTexture);
+                    }
+                }
+            });
+
+            PluginLog.Info("far discards");
+            ImportantPointers.FarDiscardPile.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
+                if (tileTexture != null) {
+                    PluginLog.Info(tileTexture.ToString());
+                    if (!tileTexture.IsMelded) {
+                        observedTileTextures.Add(tileTexture.TileTexture);
+                    }
+                }
+            });
+
+            PluginLog.Info("left discards");
+            ImportantPointers.LeftDiscardPile.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
+                if (tileTexture != null) {
+                    PluginLog.Info(tileTexture.ToString());
+                    if (!tileTexture.IsMelded) {
+                        observedTileTextures.Add(tileTexture.TileTexture);
+                    }
+                }
+            });
+
+            PluginLog.Info("player melds");
             ImportantPointers.PlayerMeldGroups.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTextures = NodeCrawlerUtils.GetTileTexturesFromPlayerMeldGroup(ptr);
                 tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
             });
 
-            ImportantPointers.PlayerDiscardPile.ForEach(ptr => {
+            PluginLog.Info("right melds");
+            ImportantPointers.RightMeldGroups.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
-                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
-                if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
-                    observedTileTextures.Add(tileTexture.TileTexture);
-                }
+                var tileTextures = NodeCrawlerUtils.GetTileTexturesFromMeldGroup(ptr);
+                tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
             });
 
-            ImportantPointers.RightDiscardPile.ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
-                if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
-                    observedTileTextures.Add(tileTexture.TileTexture);
-                }
-            });
-
-            ImportantPointers.FarDiscardPile.ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
-                if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
-                    observedTileTextures.Add(tileTexture.TileTexture);
-                }
-            });
-
-            ImportantPointers.LeftDiscardPile.ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
-                if (tileTexture != null) {
-                    PluginLog.Info(tileTexture.ToString());
-                    observedTileTextures.Add(tileTexture.TileTexture);
-                }
-            });
-
+            PluginLog.Info("far melds");
             ImportantPointers.FarMeldGroups.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTextures = NodeCrawlerUtils.GetTileTexturesFromMeldGroup(ptr);
                 tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
             });
 
+            PluginLog.Info("left melds");
+            ImportantPointers.LeftMeldGroups.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTextures = NodeCrawlerUtils.GetTileTexturesFromMeldGroup(ptr);
+                tileTextures?.ForEach(texture => PluginLog.Info(texture.ToString()));
+            });
             PluginLog.Info($"Observed count: {observedTileTextures.Count}");
         }
 
