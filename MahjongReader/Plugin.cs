@@ -10,6 +10,7 @@ using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using MahjongReader.Windows;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace MahjongReader
@@ -99,10 +100,22 @@ namespace MahjongReader
                 PluginLog.Info("Could not find Emj");
                 return;
             }
+#if DEBUG
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+#endif
 
             var observedTiles = GetObservedTiles();
             PluginLog.Info($"tiles count: {observedTiles.Count}");
-            observedTiles.ForEach(tile => PluginLog.Info(tile.ToString()));
+            var remainingMap = TileTextureUtilities.TileCountTracker.RemainingFromObserved(observedTiles);
+            foreach (var kvp in remainingMap) {
+                PluginLog.Info($"{kvp.Key} - {kvp.Value}");
+            }
+#if DEBUG
+        stopwatch.Stop();
+        TimeSpan elapsedTime = stopwatch.Elapsed;
+        PluginLog.Info($"QQQQQQQ - Elapsed time: {elapsedTime.TotalMilliseconds} ms");
+#endif
         }
 
         private unsafe void OnCommand(string command, string args)

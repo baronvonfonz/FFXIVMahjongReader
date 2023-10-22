@@ -30,7 +30,7 @@ namespace MahjongReader
                 return null;
             }
             var texString = GetImageTexturePath((AtkImageNode*)tileImageNode);
-            return texString != null ? TileTextureMap.Instance.GetTileTextureFromTexturePath(texString) : null;
+            return texString != null ? TileTextureUtilities.GetTileTextureFromTexturePath(texString) : null;
         }
 
         public unsafe DiscardTile? GetTileTextureFromDiscardTile(IntPtr nodePtr) {
@@ -46,7 +46,7 @@ namespace MahjongReader
             }
             var texString = GetImageTexturePath((AtkImageNode*)imageNode);
 
-            var tileTexture = texString != null ? TileTextureMap.Instance.GetTileTextureFromTexturePath(texString) : null;
+            var tileTexture = texString != null ? TileTextureUtilities.GetTileTextureFromTexturePath(texString) : null;
             if (tileTexture == null) {
                 return null;
             }
@@ -87,7 +87,7 @@ namespace MahjongReader
                 }
                 var texString = GetImageTexturePath((AtkImageNode*)tileImageNode);
                 if (texString != null) {
-                    meldTileTextures.Add(TileTextureMap.Instance.GetTileTextureFromTexturePath(texString));
+                    meldTileTextures.Add(TileTextureUtilities.GetTileTextureFromTexturePath(texString));
                 }
             }
 
@@ -118,7 +118,7 @@ namespace MahjongReader
                 }
                 var texString = GetImageTexturePath((AtkImageNode*)tileImageNode);
                 if (texString != null) {
-                    meldTileTextures.Add(TileTextureMap.Instance.GetTileTextureFromTexturePath(texString));
+                    meldTileTextures.Add(TileTextureUtilities.GetTileTextureFromTexturePath(texString));
                 }
             }
 
