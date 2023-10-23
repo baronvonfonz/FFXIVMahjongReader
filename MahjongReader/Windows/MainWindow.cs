@@ -13,9 +13,9 @@ public class MainWindow : Window, IDisposable
     private Plugin Plugin;
     private IPluginLog PluginLog;
 
-    private List<TileTexture> internalObservedTiles;
+    private List<ObservedTile> internalObservedTiles;
 
-    public List<TileTexture> ObservedTiles
+    public List<ObservedTile> ObservedTiles
     {
         get
         {
@@ -52,7 +52,7 @@ public class MainWindow : Window, IDisposable
 
         this.Plugin = plugin;
         this.PluginLog = pluginLog;
-        internalObservedTiles = new List<TileTexture>();
+        internalObservedTiles = new List<ObservedTile>();
         internalRemainingMap = new Dictionary<string, int>();
     }
 

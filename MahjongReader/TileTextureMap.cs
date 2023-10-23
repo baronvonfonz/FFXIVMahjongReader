@@ -28,9 +28,9 @@ namespace MahjongReader
         private string textureId;
         private string mjaiNotation;
 
-        public TileTexture(string iTextureId, string iMjaiNotation) {
-            textureId = iTextureId;
-            mjaiNotation = iMjaiNotation;
+        public TileTexture(string aTextureId, string aMjaiNotation) {
+            textureId = aTextureId;
+            mjaiNotation = aMjaiNotation;
         }
 
         public string TextureId
@@ -48,6 +48,30 @@ namespace MahjongReader
         }
     }
 
+    public class ObservedTile {
+        private MahjongNodeType playerArea;
+        private TileTexture tileTexture;
+
+        public ObservedTile(MahjongNodeType aPlayerArea, TileTexture aTileTexture) {
+            playerArea = aPlayerArea;
+            tileTexture = aTileTexture;
+        }
+
+        public MahjongNodeType PlayerArea
+        {
+            get { return playerArea; }
+        }
+
+        public TileTexture TileTexture
+        {
+            get { return tileTexture; }
+        }
+
+        public override string ToString() {
+            return $"playerArea: {Enum.GetName(playerArea)} tileTexture: {tileTexture}";
+        }        
+    }
+
     public class TileCountTracker {
         private Dictionary<string, int> notationToRemainingCount;
 
@@ -55,11 +79,11 @@ namespace MahjongReader
             notationToRemainingCount = aNotationToRemainingCount;
         }
 
-        public Dictionary<string, int> RemainingFromObserved(List<TileTexture> observedTiles) {
+        public Dictionary<string, int> RemainingFromObserved(List<ObservedTile> observedTiles) {
             Dictionary<string, int> copiedRemaining = notationToRemainingCount.ToDictionary(entry => entry.Key, entry => entry.Value);
 
-            foreach (TileTexture tileTexture in observedTiles) {
-                copiedRemaining[tileTexture.MjaiNotation]--;
+            foreach (ObservedTile observedTile in observedTiles) {
+                copiedRemaining[observedTile.TileTexture.MjaiNotation]--;
             }
 
             return copiedRemaining;

@@ -143,49 +143,57 @@ namespace MahjongReader
             }
         }
 
-        public unsafe List<TileTexture> GetObservedTiles() {
-            var observedTileTextures = new List<TileTexture>();
-            ImportantPointers.PlayerHand.ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTexture = NodeCrawlerUtils.GetTileTextureFromPlayerHandTile(ptr);
-                if (tileTexture != null) {
-                    observedTileTextures.Add(tileTexture);
-                }
-            });
-        
-            // Discarded tiles have their own node tree shape
-            ImportantPointers.PlayerDiscardPile
-                .Concat(ImportantPointers.RightDiscardPile)
-                .Concat(ImportantPointers.FarDiscardPile)
-                .Concat(ImportantPointers.LeftDiscardPile)
-                .ToList()
-                .ForEach(ptr => {
+        private unsafe List<ObservedTile> GetObservedDiscardTiles(List<IntPtr> ptrs, MahjongNodeType playerArea) {
+            var observedTileTextures = new List<ObservedTile>(); 
+            ptrs.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTexture = NodeCrawlerUtils.GetTileTextureFromDiscardTile(ptr);
                 if (tileTexture != null) {
                     if (!tileTexture.IsMelded) {
-                        observedTileTextures.Add(tileTexture.TileTexture);
+                        observedTileTextures.Add(new ObservedTile(playerArea, tileTexture.TileTexture));
                     }
                 }
             });
+            return observedTileTextures;
+        }
+
+        private unsafe List<ObservedTile> GetObservedMeldTiles(List<IntPtr> ptrs, MahjongNodeType playerArea) {
+            var observedTileTextures = new List<ObservedTile>();
+            ptrs.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTextures = NodeCrawlerUtils.GetTileTexturesFromMeldGroup(ptr);
+                tileTextures?.ForEach(texture => observedTileTextures.Add(new ObservedTile(playerArea, texture)));
+            });
+            return observedTileTextures;
+        }
+
+        public unsafe List<ObservedTile> GetObservedTiles() {
+            var observedTileTextures = new List<ObservedTile>();
+            ImportantPointers.PlayerHand.ForEach(ptr => {
+                var castedPtr = (AtkResNode*)ptr;
+                var tileTexture = NodeCrawlerUtils.GetTileTextureFromPlayerHandTile(ptr);
+                if (tileTexture != null) {
+                    observedTileTextures.Add(new ObservedTile(MahjongNodeType.PLAYER_HAND_TILE, tileTexture));
+                }
+            });
+
+            // Discarded tiles have their own node tree shape
+            observedTileTextures.AddRange(GetObservedDiscardTiles(ImportantPointers.PlayerDiscardPile, MahjongNodeType.PLAYER_DISCARD_TILE));
+            observedTileTextures.AddRange(GetObservedDiscardTiles(ImportantPointers.RightDiscardPile, MahjongNodeType.RIGHT_DISCARD_TILE));
+            observedTileTextures.AddRange(GetObservedDiscardTiles(ImportantPointers.FarDiscardPile, MahjongNodeType.FAR_DISCARD_TILE));
+            observedTileTextures.AddRange(GetObservedDiscardTiles(ImportantPointers.LeftDiscardPile, MahjongNodeType.LEFT_DISCARD_TILE));
 
             // Player melds have their own shape
             ImportantPointers.PlayerMeldGroups.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
                 var tileTextures = NodeCrawlerUtils.GetTileTexturesFromPlayerMeldGroup(ptr);
-                tileTextures?.ForEach(texture => observedTileTextures.Add(texture));
+                tileTextures?.ForEach(texture => observedTileTextures.Add(new ObservedTile(MahjongNodeType.PLAYER_MELD_GROUP, texture)));
             });
 
             // Melds that are not your own have a different node tree shape
-            ImportantPointers.RightMeldGroups
-                .Concat(ImportantPointers.FarMeldGroups)
-                .Concat(ImportantPointers.LeftMeldGroups)
-                .ToList()
-                .ForEach(ptr => {
-                var castedPtr = (AtkResNode*)ptr;
-                var tileTextures = NodeCrawlerUtils.GetTileTexturesFromMeldGroup(ptr);
-                tileTextures?.ForEach(texture => observedTileTextures.Add(texture));
-            });
+            observedTileTextures.AddRange(GetObservedMeldTiles(ImportantPointers.RightMeldGroups, MahjongNodeType.RIGHT_MELD_GROUP));
+            observedTileTextures.AddRange(GetObservedMeldTiles(ImportantPointers.FarMeldGroups, MahjongNodeType.FAR_MELD_GROUP));
+            observedTileTextures.AddRange(GetObservedMeldTiles(ImportantPointers.LeftMeldGroups, MahjongNodeType.LEFT_MELD_GROUP));
             
             return observedTileTextures;
         }
