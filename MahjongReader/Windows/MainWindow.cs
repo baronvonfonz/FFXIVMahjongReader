@@ -1,17 +1,47 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Interface.Internal;
 using Dalamud.Interface.Windowing;
+using Dalamud.Plugin.Services;
 using ImGuiNET;
 
 namespace MahjongReader.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private IDalamudTextureWrap GoatImage;
     private Plugin Plugin;
+    private IPluginLog PluginLog;
 
-    public MainWindow(Plugin plugin, IDalamudTextureWrap goatImage) : base(
+    private List<TileTexture> internalObservedTiles;
+
+    public List<TileTexture> ObservedTiles
+    {
+        get
+        {
+            return internalObservedTiles;
+        }
+        set
+        {
+            internalObservedTiles = value;
+        }
+    }
+
+    private Dictionary<string, int> internalRemainingMap;
+
+    public Dictionary<string, int> RemainingMap
+    {
+        get
+        {
+            return internalRemainingMap;
+        }
+        set
+        {
+            internalRemainingMap = value;
+        }
+    }
+
+    public MainWindow(Plugin plugin, IPluginLog pluginLog) : base(
         "My Amazing Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         this.SizeConstraints = new WindowSizeConstraints
@@ -20,29 +50,25 @@ public class MainWindow : Window, IDisposable
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
-        this.GoatImage = goatImage;
         this.Plugin = plugin;
+        this.PluginLog = pluginLog;
+        internalObservedTiles = new List<TileTexture>();
+        internalRemainingMap = new Dictionary<string, int>();
     }
 
-    public void Dispose()
-    {
-        this.GoatImage.Dispose();
-    }
+    public void Dispose() { }
 
     public override void Draw()
     {
-        ImGui.Text($"The random config bool is {this.Plugin.Configuration.SomePropertyToBeSavedAndWithADefault}");
-
-        if (ImGui.Button("Show Settings"))
-        {
-            this.Plugin.DrawConfigUI();
-        }
-
         ImGui.Spacing();
-
-        ImGui.Text("Have a goat:");
+        // var observedTiles = Plugin.GetObservedTiles();
+        // var remainingMap = TileTextureUtilities.TileCountTracker.RemainingFromObserved(observedTiles);
+        // foreach (var kvp in remainingMap) {
+        //     PluginLog.Info($"{kvp.Key} - {kvp.Value}");
+        // }
         ImGui.Indent(55);
-        ImGui.Image(this.GoatImage.ImGuiHandle, new Vector2(this.GoatImage.Width, this.GoatImage.Height));
-        ImGui.Unindent(55);
+        foreach (var kvp in internalRemainingMap) {
+            ImGui.Text($"{kvp.Key} - {kvp.Value}");
+        }
     }
 }

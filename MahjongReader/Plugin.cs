@@ -1,17 +1,21 @@
 ﻿using System;
 using System.IO;
-using Dalamud.Interface.Windowing;
-using Dalamud.Plugin.Services;
-using Dalamud.Game.Command;
-using Dalamud.IoC;
-using Dalamud.Plugin;
-using Dalamud.Game.Addon.Lifecycle;
-using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using MahjongReader.Windows;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using Dalamud.Interface.Windowing;
+using Dalamud.Game.Command;
+using Dalamud.IoC;
+using Dalamud.Interface;
+using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
+using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using ImGuiNET;
+using MahjongReader.Windows;
+using Dalamud.Interface.Utility;
 
 namespace MahjongReader
 {
@@ -35,6 +39,7 @@ namespace MahjongReader
 
         private ImportantPointers ImportantPointers { get; init; }
         private NodeCrawlerUtils NodeCrawlerUtils { get; init; }
+        private Task WindowUpdateTask { get; set; } = null!;
 
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -46,19 +51,15 @@ namespace MahjongReader
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(this.PluginInterface);
 
-            // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
-
             ConfigWindow = new ConfigWindow(this);
-            MainWindow = new MainWindow(this, goatImage);
+            MainWindow = new MainWindow(this, PluginLog);
             
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(MainWindow);
 
             this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "A useful message to display in /xlhelp"
+                HelpMessage = "Tracks observed Mahjong tiles and available Yaku (TODO)"
             });
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
@@ -82,39 +83,53 @@ namespace MahjongReader
         }
 
         private unsafe void OnAddonPostSetup(AddonEvent type, AddonArgs args) {
-            AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, "Emj", OnAddonPostRefresh);
             var addonPtr = args.Addon;
             if (addonPtr == IntPtr.Zero) {
                 PluginLog.Info("Could not find Emj");
                 return;
             }
+            AddonLifecycle.RegisterListener(AddonEvent.PostRefresh, "Emj", OnAddonPostRefresh);
+            AddonLifecycle.RegisterListener(AddonEvent.PreFinalize, "Emj", OnAddonPreFinalize);
+
+            MainWindow.IsOpen = true;
             var addon = (AtkUnitBase*)addonPtr;
             var rootNode = addon->RootNode;
             ImportantPointers.WipePointers();
             NodeCrawlerUtils.TraverseAllAtkResNodes(rootNode, (intPtr) => ImportantPointers.MaybeTrackPointer(intPtr));
         }
 
-        private unsafe void OnAddonPostRefresh(AddonEvent type, AddonArgs args) {
+        private void OnAddonPreFinalize(AddonEvent type, AddonArgs args) {
+            MainWindow.IsOpen = false;
+        }
+
+        private void OnAddonPostRefresh(AddonEvent type, AddonArgs args) {
             var addonPtr = args.Addon;
             if (addonPtr == IntPtr.Zero) {
                 PluginLog.Info("Could not find Emj");
                 return;
             }
+
+            if (WindowUpdateTask == null || WindowUpdateTask.IsCompleted || WindowUpdateTask.IsFaulted || WindowUpdateTask.IsCanceled) {
+                PluginLog.Info("Running window updater");
+                WindowUpdateTask = Task.Run(WindowUpdater);
+            }
+        }
+
+        private unsafe void WindowUpdater() {
 #if DEBUG
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
+    Stopwatch stopwatch = new Stopwatch();
+    stopwatch.Start();
 #endif
 
             var observedTiles = GetObservedTiles();
             PluginLog.Info($"tiles count: {observedTiles.Count}");
             var remainingMap = TileTextureUtilities.TileCountTracker.RemainingFromObserved(observedTiles);
-            foreach (var kvp in remainingMap) {
-                PluginLog.Info($"{kvp.Key} - {kvp.Value}");
-            }
+            MainWindow.ObservedTiles = observedTiles;
+            MainWindow.RemainingMap = remainingMap;
 #if DEBUG
-        stopwatch.Stop();
-        TimeSpan elapsedTime = stopwatch.Elapsed;
-        PluginLog.Info($"QQQQQQQ - Elapsed time: {elapsedTime.TotalMilliseconds} ms");
+    stopwatch.Stop();
+    TimeSpan elapsedTime = stopwatch.Elapsed;
+    PluginLog.Info($"QQQQQQQ - Elapsed time: {elapsedTime.TotalMilliseconds} ms");
 #endif
         }
 
@@ -128,7 +143,7 @@ namespace MahjongReader
             }
         }
 
-        private unsafe List<TileTexture> GetObservedTiles() {
+        public unsafe List<TileTexture> GetObservedTiles() {
             var observedTileTextures = new List<TileTexture>();
             ImportantPointers.PlayerHand.ForEach(ptr => {
                 var castedPtr = (AtkResNode*)ptr;
