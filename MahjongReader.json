@@ -1,4 +1,4 @@
-{
+[{
   "Author": "baronvonfonz",
   "Name": "MahjongReader",
   "InternalName": "MahjongReader",
@@ -19,4 +19,4 @@
   "DownloadLinkTesting": "https://github.com/baronvonfonz/FFXIVMahjongReader/releases/download/v1.0.0/latest.zip",
   "DownloadLinkUpdate": "https://github.com/baronvonfonz/FFXIVMahjongReader/releases/download/v1.0.0/latest.zip",
   "AcceptsFeedback": true
-}
+}]
