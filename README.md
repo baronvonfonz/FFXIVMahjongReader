@@ -1,8 +1,7 @@
 # MahjongReader
 
 Shows observed tiles so you don't have to manually count in long games.
-![image](https://github.com/baronvonfonz/FFXIVMahjongReader/assets/123319797/8d8057b8-569a-4a0a-ab96-4ecc5a5260cf)
-
+![image](https://github.com/baronvonfonz/FFXIVMahjongReader/assets/123319797/c3efc506-ec5c-4338-b753-ef8794cdebe6)
 
 TODO:
 - [] Show available/disqualified yaku
