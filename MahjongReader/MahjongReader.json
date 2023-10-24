@@ -5,6 +5,7 @@
   "Description": "Track your Mahjong games for later review.",
   "InternalName": "mahjongReader",
   "ApplicableVersion": "any",
+  "RepoUrl": "https://github.com/baronvonfonz/FFXIVMahjongReader",
   "Tags": [
     "mahjong"
   ]
