@@ -1,10 +1,9 @@
 {
   "Author": "baronvonfonz",
-  "Name": "Mahjong Reader",
+  "Name": "MahjongReader",
   "Punchline": "Track your Mahjong games for later review.",
   "Description": "Track your Mahjong games for later review.",
-  "InternalName": "mahjongReader",
-  "ApplicableVersion": "any",
+  "InternalName": "MahjongReader",
   "RepoUrl": "https://github.com/baronvonfonz/FFXIVMahjongReader",
   "Tags": [
     "mahjong"
