@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Interface.Colors;
 using Dalamud.Interface.Internal;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using ImGuiNET;
@@ -41,12 +43,14 @@ public class MainWindow : Window, IDisposable
         }
     }
 
+    private Dictionary<string, IDalamudTextureWrap> mjaiNotationToTexture;
+
     public MainWindow(Plugin plugin, IPluginLog pluginLog) : base(
-        "My Amazing Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+        "Mahjong Reader", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         this.SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(375, 330),
+            MinimumSize = new Vector2(275, 330),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
@@ -54,21 +58,69 @@ public class MainWindow : Window, IDisposable
         this.PluginLog = pluginLog;
         internalObservedTiles = new List<ObservedTile>();
         internalRemainingMap = new Dictionary<string, int>();
+
+        mjaiNotationToTexture = new();
+        // setup textures
+        foreach (var notationToTextureId in TileTextureUtilities.NotationToTextureId) {
+            var maybeTex = Plugin.TextureProvider.GetIcon(uint.Parse(notationToTextureId.Value));
+            if (maybeTex == null) {
+                PluginLog.Error($"Bad texture id for notation ${notationToTextureId.Key}");
+                continue;
+            }
+            mjaiNotationToTexture.Add(notationToTextureId.Key, maybeTex);
+        }
     }
 
     public void Dispose() { }
 
+
+    private void DrawTileRemaining(string suit, int number, bool isDora) {
+        var notation = $"{number}{suit}";
+        var count = isDora ? internalRemainingMap[notation] + internalRemainingMap[$"0{suit}"] : internalRemainingMap[notation];
+        var isDoraRemaing = isDora ? internalRemainingMap[$"0{suit}"] > 0 : false;
+        var texture = mjaiNotationToTexture[notation];
+        var scale = new Vector2(texture.Width, texture.Height);
+        var textSpacing = new Vector2(0, 0);
+        ImGui.TableNextColumn();
+        ImGui.Image(texture.ImGuiHandle, scale);
+        ImGui.SameLine();
+        ImGui.Dummy(textSpacing);
+        ImGui.SameLine();
+        if (isDoraRemaing) {
+            ImGui.TextColored(ImGuiColors.DalamudOrange, "x " + count);
+        } else {
+            ImGui.Text("x " + count);
+        }
+    }
     public override void Draw()
     {
-        ImGui.Spacing();
-        // var observedTiles = Plugin.GetObservedTiles();
-        // var remainingMap = TileTextureUtilities.TileCountTracker.RemainingFromObserved(observedTiles);
-        // foreach (var kvp in remainingMap) {
-        //     PluginLog.Info($"{kvp.Key} - {kvp.Value}");
-        // }
-        ImGui.Indent(55);
-        foreach (var kvp in internalRemainingMap) {
-            ImGui.Text($"{kvp.Key} - {kvp.Value}");
+        ImGui.BeginTable("#Tiles", 3, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.SizingFixedFit);
+        for (var i = 1; i < 10; i++) {
+            ImGui.TableNextRow();
+            bool isDora = i == 5;
+
+            DrawTileRemaining("m", i, isDora);
+            DrawTileRemaining("p", i, isDora);
+            DrawTileRemaining("s", i, isDora);
+
         }
+        ImGui.EndTable();
+
+        ImGui.Dummy(new Vector2(0, 40));
+
+        ImGui.BeginTable("#TilesWind", 4, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.SizingFixedFit);
+        ImGui.TableNextRow();
+        for (var i = 1; i < 5; i++) {
+            DrawTileRemaining("z", i, false);
+        }
+        ImGui.EndTable();
+
+        ImGui.BeginTable("#TilesDragon", 3, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.SizingFixedFit);
+        ImGui.TableNextRow();
+        ImGui.TableNextRow();
+        for (var i = 5; i < 8; i++) {
+            DrawTileRemaining("z", i, false);
+        }
+        ImGui.EndTable();
     }
 }

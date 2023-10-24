@@ -28,6 +28,7 @@ namespace MahjongReader
         [PluginService] public static IGameGui GameGui { get; private set; } = null!;
         [PluginService] public static IPluginLog PluginLog { get; private set; } = null!;
         [PluginService] internal static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
+        [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private ICommandManager CommandManager { get; init; }

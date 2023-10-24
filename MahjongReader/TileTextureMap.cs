@@ -91,11 +91,13 @@ namespace MahjongReader
     }
 
     public class TileTextureUtilities {
-        public static Dictionary<string, TileTexture> TextureIdToNotation;
+        public static Dictionary<string, TileTexture> TextureIdToTileTexture;
+        public static Dictionary<string, string> NotationToTextureId;
         public static TileCountTracker TileCountTracker;
 
         static TileTextureUtilities() {
-            Dictionary<string, TileTexture> map = new Dictionary<string, TileTexture>();
+            Dictionary<string, TileTexture> textureIdToTileTexture = new Dictionary<string, TileTexture>();
+            Dictionary<string, string> notationToTextureId = new Dictionary<string, string>();
             Dictionary<string, int> countMap = new Dictionary<string, int>();
 
             Action<int, string> updateCountMap = (number, notation) => {
@@ -122,7 +124,8 @@ namespace MahjongReader
                 int nextTextureId = i + 76040; //41 is the actual character/man start
                 string fullTextureId = "0" + nextTextureId.ToString();
                 string notation = i.ToString() + "m";
-                map.Add(fullTextureId, new TileTexture(fullTextureId, notation));
+                textureIdToTileTexture.Add(fullTextureId, new TileTexture(fullTextureId, notation));
+                notationToTextureId.Add(notation, fullTextureId);
                 updateCountMap(i, notation);
             }
 
@@ -131,7 +134,8 @@ namespace MahjongReader
                 int nextTextureId = i + 076049; //50 is the actual dots/pin start
                 string fullTextureId = "0" + nextTextureId.ToString();
                 string notation = i.ToString() + "p";
-                map.Add(fullTextureId, new TileTexture(fullTextureId, notation));
+                textureIdToTileTexture.Add(fullTextureId, new TileTexture(fullTextureId, notation));
+                notationToTextureId.Add(notation, fullTextureId);
                 updateCountMap(i, notation);
             }
 
@@ -140,7 +144,8 @@ namespace MahjongReader
                 int nextTextureId = i + 076058; //59 is the actual bamboo/sou start
                 string fullTextureId = "0" + nextTextureId.ToString();
                 string notation = i.ToString() + "s";
-                map.Add(fullTextureId, new TileTexture(fullTextureId, notation));
+                textureIdToTileTexture.Add(fullTextureId, new TileTexture(fullTextureId, notation));
+                notationToTextureId.Add(notation, fullTextureId);
                 updateCountMap(i, notation);
             }
 
@@ -149,18 +154,31 @@ namespace MahjongReader
                 int nextTextureId = i + 076067; //68 is the actual honor tile start
                 string fullTextureId = "0" + nextTextureId.ToString();
                 string notation = i.ToString() + "z";
-                map.Add(fullTextureId, new TileTexture(fullTextureId, notation));
+                textureIdToTileTexture.Add(fullTextureId, new TileTexture(fullTextureId, notation));
+                notationToTextureId.Add(notation, fullTextureId);
                 updateCountMap(i, notation);
             }
 
-            map.Add("076075", new TileTexture("076075", "0m"));
-            countMap.Add("0m", 1);
-            map.Add("076076", new TileTexture("076076", "0p"));
-            countMap.Add("0p", 1);
-            map.Add("076077", new TileTexture("076077", "0s"));
-            countMap.Add("0s", 1);
+            string manDoraNotation = "0m";
+            string manDoraTextureId = "076075";
+            textureIdToTileTexture.Add(manDoraTextureId, new TileTexture(manDoraTextureId, manDoraNotation));
+            countMap.Add(manDoraNotation, 1);
+            notationToTextureId.Add(manDoraNotation, manDoraTextureId);
 
-            TextureIdToNotation = map;
+            string pinDoraNotation = "0p";
+            string pinDoraTextureId = "076076";
+            textureIdToTileTexture.Add(pinDoraTextureId, new TileTexture(pinDoraTextureId, pinDoraNotation));
+            countMap.Add(pinDoraNotation, 1);
+            notationToTextureId.Add(pinDoraNotation, pinDoraTextureId);
+
+            string souDoraNotation = "0s";
+            string souDoraTextureId = "076077";
+            textureIdToTileTexture.Add(souDoraTextureId, new TileTexture(souDoraTextureId, souDoraNotation));
+            countMap.Add(souDoraNotation, 1);
+            notationToTextureId.Add(souDoraNotation, souDoraTextureId);
+
+            TextureIdToTileTexture = textureIdToTileTexture;
+            NotationToTextureId = notationToTextureId;
             TileCountTracker = new TileCountTracker(countMap);
         }
 
@@ -173,15 +191,15 @@ namespace MahjongReader
 
         public static TileTexture GetTileTextureFromTexturePath(string texturePath) {
             var textureTex = texturePath.Substring(15, 6);
-            if (!TextureIdToNotation.ContainsKey(textureTex)) {
+            if (!TextureIdToTileTexture.ContainsKey(textureTex)) {
                 throw new ApplicationException("Unknown key: " + texturePath);
             }
 
-            return TextureIdToNotation[textureTex];
+            return TextureIdToTileTexture[textureTex];
         }
 
         public static void PrintTest(IPluginLog pluginLog) {
-            foreach (var kvp in TextureIdToNotation) {
+            foreach (var kvp in TextureIdToTileTexture) {
                 TileTexture value = kvp.Value;
                 pluginLog.Info(value.ToString());
             }
