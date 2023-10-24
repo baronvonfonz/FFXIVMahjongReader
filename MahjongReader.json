@@ -2,7 +2,7 @@
   "Author": "baronvonfonz",
   "Name": "MahjongReader",
   "InternalName": "MahjongReader",
-  "AssemblyVersion": "0.0.0.1",
+  "AssemblyVersion": "1.0.0",
   "Description": "Track your Mahjong games for later review.",
   "ApplicableVersion": "any",
   "RepoUrl": "https://github.com/baronvonfonz/FFXIVMahjongReader",
@@ -15,5 +15,8 @@
   "CanUnloadAsync": false,
   "LoadPriority": 0,
   "Punchline": "Track your Mahjong games for later review.",
+  "DownloadLinkInstall": "https://github.com/baronvonfonz/FFXIVMahjongReader/releases/download/v1.0.0/latest.zip",
+  "DownloadLinkTesting": "https://github.com/baronvonfonz/FFXIVMahjongReader/releases/download/v1.0.0/latest.zip",
+  "DownloadLinkUpdate": "https://github.com/baronvonfonz/FFXIVMahjongReader/releases/download/v1.0.0/latest.zip",
   "AcceptsFeedback": true
 }
