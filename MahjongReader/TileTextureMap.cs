@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using Dalamud.Logging;
-using Dalamud.Plugin.Services;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 namespace MahjongReader
 {
@@ -196,13 +192,6 @@ namespace MahjongReader
             }
 
             return TextureIdToTileTexture[textureTex];
-        }
-
-        public static void PrintTest(IPluginLog pluginLog) {
-            foreach (var kvp in TextureIdToTileTexture) {
-                TileTexture value = kvp.Value;
-                pluginLog.Info(value.ToString());
-            }
         }
     }
 }
