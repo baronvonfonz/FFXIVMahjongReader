@@ -12,6 +12,7 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using GameModel;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using MahjongReader.Windows;
@@ -41,6 +42,7 @@ namespace MahjongReader
         private ImportantPointers ImportantPointers { get; init; }
         private NodeCrawlerUtils NodeCrawlerUtils { get; init; }
         private Task WindowUpdateTask { get; set; } = null!;
+        private YakuDetector YakuDetector { get; init; }
 
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -69,6 +71,7 @@ namespace MahjongReader
             AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "Emj", OnAddonPostSetup);
             ImportantPointers = new ImportantPointers(PluginLog);
             NodeCrawlerUtils = new NodeCrawlerUtils(PluginLog);
+            YakuDetector = new YakuDetector();
         }
 
         public void Dispose()

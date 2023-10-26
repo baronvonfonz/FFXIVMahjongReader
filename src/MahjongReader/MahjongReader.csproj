@@ -11,4 +11,8 @@
     <PackageProjectUrl>https://github.com/baronvonfonz/FFXIVMahjongReader</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GameModel\GameModel.csproj"/>
+  </ItemGroup>
 </Project>

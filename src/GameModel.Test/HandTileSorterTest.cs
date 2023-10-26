@@ -1,14 +1,15 @@
 using GameModel;
-using NUnit.Framework;
+using System.Collections.Generic;
+using Xunit;
 
 namespace GameModel.Test {
     public class HandTileSorterTest {
-        [Test]
-        public void MyTestMethod()
+        [Fact]
+        public void TestMethod()
         {
             var handTileSorter = new HandTileSorter();
-            var result = handTileSorter.Convert(new());
-            Assert.AreEqual(4, result.Length);
+            var result = handTileSorter.Convert(new ());
+            Assert.Equal(4, result.Length);
         }
     }
 }
