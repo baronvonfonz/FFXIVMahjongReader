@@ -97,6 +97,9 @@ namespace MahjongReader
 
         public unsafe List<TileTexture>? GetTileTexturesFromPlayerMeldGroup(IntPtr nodePtr) {
             var compNode = (AtkComponentNode*)nodePtr;
+            if (!compNode->AtkResNode.IsVisible) {
+                return null;
+            }
             var meldTileTextures = new List<TileTexture>();
             // four child component nodes, each has similar pattern
             for (var i = 0; i < 4; i ++) {
