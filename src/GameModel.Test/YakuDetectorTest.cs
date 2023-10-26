@@ -1,7 +1,7 @@
 using GameModel;
 using NUnit.Framework;
 
-namespace MahjongReader.Tests {
+namespace GameModel.Test {
     public class YakuDetectorTest {
         [Test]
         public void MyTestMethod()

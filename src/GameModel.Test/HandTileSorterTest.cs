@@ -1,7 +1,7 @@
 using GameModel;
 using NUnit.Framework;
 
-namespace MahjongReader.Tests {
+namespace GameModel.Test {
     public class HandTileSorterTest {
         [Test]
         public void MyTestMethod()

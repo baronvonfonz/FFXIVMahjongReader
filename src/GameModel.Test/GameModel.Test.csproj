@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>MahjongReader.Tests</AssemblyName>
-    <RootNamespace>MahjongReader.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
     <TargetFramework>net7.0-windows</TargetFramework>
+    <RootNamespace>GameModel.Test</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MahjongReader\MahjongReader.csproj" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+    <ProjectReference Include="..\GameModel\GameModel.csproj"/>
   </ItemGroup>
 </Project>
