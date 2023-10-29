@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED9EF4E2-62E1-490D-9362-C31A485084F4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4BDD3BC2-7DED-4117-B552-9EEAF1349802}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameModel", "src\GameModel\GameModel.csproj", "{BB36D2C9-21C1-49BE-83F0-DFB1244E1270}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameModel", "src\GameModel\GameModel.csproj", "{E608E0B2-CC9C-4EF2-8359-3965EAAB682D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameModel.Test", "src\GameModel.Test\GameModel.Test.csproj", "{0DFF04D8-AA09-4A6A-A768-6AECDA9201F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameModel.Test", "src\GameModel.Test\GameModel.Test.csproj", "{719D7496-609D-4A08-AEE3-ED0FC9706AD4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MahjongReader", "src\MahjongReader\MahjongReader.csproj", "{E2951CE4-C8BB-4933-9D28-8F413CAA9BF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MahjongReader", "src\MahjongReader\MahjongReader.csproj", "{FC7C685A-6BA8-400C-84FD-B4227DF280D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,28 +17,28 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BB36D2C9-21C1-49BE-83F0-DFB1244E1270}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB36D2C9-21C1-49BE-83F0-DFB1244E1270}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB36D2C9-21C1-49BE-83F0-DFB1244E1270}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB36D2C9-21C1-49BE-83F0-DFB1244E1270}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0DFF04D8-AA09-4A6A-A768-6AECDA9201F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0DFF04D8-AA09-4A6A-A768-6AECDA9201F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0DFF04D8-AA09-4A6A-A768-6AECDA9201F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0DFF04D8-AA09-4A6A-A768-6AECDA9201F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2951CE4-C8BB-4933-9D28-8F413CAA9BF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2951CE4-C8BB-4933-9D28-8F413CAA9BF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2951CE4-C8BB-4933-9D28-8F413CAA9BF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2951CE4-C8BB-4933-9D28-8F413CAA9BF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E608E0B2-CC9C-4EF2-8359-3965EAAB682D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E608E0B2-CC9C-4EF2-8359-3965EAAB682D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E608E0B2-CC9C-4EF2-8359-3965EAAB682D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E608E0B2-CC9C-4EF2-8359-3965EAAB682D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{719D7496-609D-4A08-AEE3-ED0FC9706AD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{719D7496-609D-4A08-AEE3-ED0FC9706AD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{719D7496-609D-4A08-AEE3-ED0FC9706AD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{719D7496-609D-4A08-AEE3-ED0FC9706AD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC7C685A-6BA8-400C-84FD-B4227DF280D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC7C685A-6BA8-400C-84FD-B4227DF280D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC7C685A-6BA8-400C-84FD-B4227DF280D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC7C685A-6BA8-400C-84FD-B4227DF280D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{BB36D2C9-21C1-49BE-83F0-DFB1244E1270} = {ED9EF4E2-62E1-490D-9362-C31A485084F4}
-		{0DFF04D8-AA09-4A6A-A768-6AECDA9201F3} = {ED9EF4E2-62E1-490D-9362-C31A485084F4}
-		{E2951CE4-C8BB-4933-9D28-8F413CAA9BF6} = {ED9EF4E2-62E1-490D-9362-C31A485084F4}
+		{E608E0B2-CC9C-4EF2-8359-3965EAAB682D} = {4BDD3BC2-7DED-4117-B552-9EEAF1349802}
+		{719D7496-609D-4A08-AEE3-ED0FC9706AD4} = {4BDD3BC2-7DED-4117-B552-9EEAF1349802}
+		{FC7C685A-6BA8-400C-84FD-B4227DF280D1} = {4BDD3BC2-7DED-4117-B552-9EEAF1349802}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {1306AC8C-6CC4-45AE-A20C-1E79711A589A}
+		SolutionGuid = {5D586A08-9F67-47DE-B314-328ACB921DA6}
 	EndGlobalSection
 EndGlobal
