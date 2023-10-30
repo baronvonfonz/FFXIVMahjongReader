@@ -14,7 +14,7 @@ namespace GameModel.Test {
         }
 
         [Fact]
-        public void TestMethod()
+        public void TestHappyPath()
         {
             var handList = new List<string>() { 
                 "1z", 
@@ -38,6 +38,60 @@ namespace GameModel.Test {
             };
             var result = handTileSorter.Convert(handList);
             Assert.Equal("88p111222333444z", result);
+        }
+
+        [Fact]
+        public void TestFourSuits()
+        {
+            var handList = new List<string>() { 
+                "1z", 
+                "1z", 
+                "1z", 
+
+                "2m", 
+                "2m", 
+                "2m", 
+
+                "3p", 
+                "3p", 
+                "3p", 
+
+                "4s", 
+                "4s", 
+                "4s", 
+
+                "8p", 
+                "8p", 
+            };
+            var result = handTileSorter.Convert(handList);
+            Assert.Equal("222m33388p444s111z", result);
+        }
+
+        [Fact]
+        public void TestOneSuit()
+        {
+            var handList = new List<string>() { 
+                "1z", 
+                "1z", 
+                "1z", 
+
+                "2z", 
+                "2z", 
+                "2z", 
+
+                "3z", 
+                "3z", 
+                "3z", 
+
+                "4z", 
+                "4z", 
+                "4z", 
+
+                "5z", 
+                "5z", 
+            };
+            var result = handTileSorter.Convert(handList);
+            Assert.Equal("11122233344455z", result);
         }
     }
 }

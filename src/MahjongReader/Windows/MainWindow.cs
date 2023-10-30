@@ -1,9 +1,9 @@
-﻿using System;
+﻿using GameModel;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Internal;
-using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using ImGuiNET;
@@ -99,9 +99,9 @@ public class MainWindow : Window, IDisposable
             ImGui.TableNextRow();
             bool isDora = i == 5;
 
-            DrawTileRemaining("m", i, isDora);
-            DrawTileRemaining("p", i, isDora);
-            DrawTileRemaining("s", i, isDora);
+            DrawTileRemaining(Suit.MAN, i, isDora);
+            DrawTileRemaining(Suit.PIN, i, isDora);
+            DrawTileRemaining(Suit.SOU, i, isDora);
 
         }
         ImGui.EndTable();
@@ -111,7 +111,7 @@ public class MainWindow : Window, IDisposable
         ImGui.BeginTable("#TilesWind", 4, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.SizingFixedFit);
         ImGui.TableNextRow();
         for (var i = 1; i < 5; i++) {
-            DrawTileRemaining("z", i, false);
+            DrawTileRemaining(Suit.HONOR, i, false);
         }
         ImGui.EndTable();
 
@@ -119,7 +119,7 @@ public class MainWindow : Window, IDisposable
         ImGui.TableNextRow();
         ImGui.TableNextRow();
         for (var i = 5; i < 8; i++) {
-            DrawTileRemaining("z", i, false);
+            DrawTileRemaining(Suit.HONOR, i, false);
         }
         ImGui.EndTable();
     }

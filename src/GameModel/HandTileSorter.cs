@@ -6,11 +6,25 @@ using System.Runtime.InteropServices;
 namespace GameModel {
     
     public class HandTileSorter {
-        private readonly List<string> suitOrder = new List<string> { "m", "p", "s", "z" };
-
-        public HandTileSorter() {}
+        private readonly List<string> suitOrder = new List<string> { Suit.MAN, Suit.PIN, Suit.SOU, Suit.HONOR };
 
         public string Convert(List<string> mjaiNotations) {
+           var suitToNumbers = SuitToNumbers(mjaiNotations);
+
+            var returnString = "";
+
+            foreach (var suit in suitOrder) {
+                if (!suitToNumbers.ContainsKey(suit)) {
+                    continue;
+                }
+                var theNumbers = suitToNumbers[suit];
+                returnString += $"{string.Join("", theNumbers)}{suit}";
+            }
+
+            return returnString;
+        }
+
+        public Dictionary<string, List<int>> SuitToNumbers(List<string> mjaiNotations) {
             if (mjaiNotations.Count < 1) {
                 throw new ApplicationException("At least one tile is required to converted to a string.");
             }
@@ -31,17 +45,7 @@ namespace GameModel {
                  }
             });
 
-            var returnString = "";
-
-            foreach (var suit in suitOrder) {
-                if (!suitToNumbers.ContainsKey(suit)) {
-                    continue;
-                }
-                var theNumbers = suitToNumbers[suit];
-                returnString += $"{string.Join("", theNumbers)}{suit}";
-            }
-
-            return returnString;
+            return suitToNumbers;
         }
     }
 }

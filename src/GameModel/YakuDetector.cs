@@ -29,10 +29,22 @@ namespace GameModel
     }
 
     public class YakuDetector {
-        public YakuDetector() {}
+        private HandTileSorter handTileSorter; // someday really gotta pick a single C# field/object pattern
+
+        public YakuDetector() {
+            handTileSorter = new HandTileSorter();
+        }
 
         public List<YakuEligibility> GetYakuEligibility(List<string> mjaiNotations) {
+            var suitToNumbers = handTileSorter.SuitToNumbers(mjaiNotations);
+
+            // var maybeTanyao = CheckTanyao(suitToNumbers);
+
             return new();
         }
+
+        // private YakuEligibility CheckTanyao(Dictionary<string, List<int>> suitToNumbers) {
+        //     return new(YakuDefinition.T);
+        // }
     }
 }
