@@ -43,7 +43,22 @@ public class MainWindow : Window, IDisposable
         }
     }
 
+    private Dictionary<string, int> internalSuitCounts;
+
+    public Dictionary<string, int> SuitCounts
+    {
+        get
+        {
+            return internalSuitCounts;
+        }
+        set
+        {
+            internalSuitCounts = value;
+        }
+    }
+
     private Dictionary<string, IDalamudTextureWrap> mjaiNotationToTexture;
+    private Dictionary<string, IDalamudTextureWrap> suitToTexture;
 
     public MainWindow(Plugin plugin, IPluginLog pluginLog) : base(
         "Mahjong Reader", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
@@ -58,6 +73,7 @@ public class MainWindow : Window, IDisposable
         this.PluginLog = pluginLog;
         internalObservedTiles = new List<ObservedTile>();
         internalRemainingMap = new Dictionary<string, int>();
+        internalSuitCounts = new Dictionary<string, int>();
 
         mjaiNotationToTexture = new();
         // setup textures
@@ -69,6 +85,12 @@ public class MainWindow : Window, IDisposable
             }
             mjaiNotationToTexture.Add(notationToTextureId.Key, maybeTex);
         }
+
+        suitToTexture = new();
+        // maybe one day we'll support traditional properly
+        suitToTexture.Add(Suit.MAN, Plugin.TextureProvider.GetIcon(uint.Parse("076001"))!);
+        suitToTexture.Add(Suit.PIN, Plugin.TextureProvider.GetIcon(uint.Parse("076010"))!);
+        suitToTexture.Add(Suit.SOU, Plugin.TextureProvider.GetIcon(uint.Parse("076019"))!);
     }
 
     public void Dispose() { }
@@ -92,9 +114,22 @@ public class MainWindow : Window, IDisposable
             ImGui.Text("x " + count);
         }
     }
+
+    private void DrawSuitRemaining(string suit) {
+        var count = internalSuitCounts[suit];
+        var texture = suitToTexture[suit];
+        var scale = new Vector2(texture.Width, texture.Height);
+        var textSpacing = new Vector2(0, 0);
+        ImGui.TableNextColumn();
+        ImGui.Image(texture.ImGuiHandle, scale);
+        ImGui.SameLine();
+        ImGui.Dummy(textSpacing);
+        ImGui.SameLine();
+        ImGui.Text("x " + count);
+    }
     public override void Draw()
     {
-        ImGui.BeginTable("#Tiles", 3, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.SizingFixedFit);
+        ImGui.BeginTable("#Tiles", 4, ImGuiTableFlags.BordersInnerV | ImGuiTableFlags.SizingFixedFit);
         for (var i = 1; i < 10; i++) {
             ImGui.TableNextRow();
             bool isDora = i == 5;
@@ -103,6 +138,15 @@ public class MainWindow : Window, IDisposable
             DrawTileRemaining(Suit.PIN, i, isDora);
             DrawTileRemaining(Suit.SOU, i, isDora);
 
+            if (i == 3) {
+                DrawSuitRemaining(Suit.MAN);
+            } else if (i == 5) {
+                DrawSuitRemaining(Suit.PIN);
+            } else if (i == 7) {
+                DrawSuitRemaining(Suit.SOU);
+            } else {
+                ImGui.TableNextColumn();
+            }
         }
         ImGui.EndTable();
 

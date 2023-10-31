@@ -7,6 +7,7 @@ BUGS:
 
 - [ ] As tiles shift from recently drawn to hand; the count flickes
 - [ ] Honor tiles in the player meld zone sometimes count again next game (visibility issue)
+- [ ] concealed Kan do not count as observed tiles
 
 TODO:
 - [ ] Show available/disqualified yaku

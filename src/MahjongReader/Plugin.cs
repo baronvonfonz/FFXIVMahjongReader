@@ -128,8 +128,23 @@ namespace MahjongReader
             var observedTiles = GetObservedTiles();
             PluginLog.Info($"tiles count: {observedTiles.Count}");
             var remainingMap = TileTextureUtilities.TileCountTracker.RemainingFromObserved(observedTiles);
+            var suitCounts = new Dictionary<string, int>();
+            foreach (var kvp in remainingMap) { // imagine testing
+                var suit = kvp.Key.Substring(1, 1);
+                if (suit == Suit.HONOR) {
+                    continue;
+                }
+                
+                if (suitCounts.ContainsKey(suit)) {
+                    suitCounts[suit] += kvp.Value;
+                } else {
+                    suitCounts.Add(suit, kvp.Value);
+                }
+            }
+
             MainWindow.ObservedTiles = observedTiles;
             MainWindow.RemainingMap = remainingMap;
+            MainWindow.SuitCounts = suitCounts;
 #if DEBUG
     stopwatch.Stop();
     TimeSpan elapsedTime = stopwatch.Elapsed;

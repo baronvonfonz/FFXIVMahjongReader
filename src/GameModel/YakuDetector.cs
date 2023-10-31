@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GameModel
 {
@@ -38,13 +39,31 @@ namespace GameModel
         public List<YakuEligibility> GetYakuEligibility(List<string> mjaiNotations) {
             var suitToNumbers = handTileSorter.SuitToNumbers(mjaiNotations);
 
-            // var maybeTanyao = CheckTanyao(suitToNumbers);
+            var maybeTanyao = CheckTanyao(suitToNumbers);
 
-            return new();
+            return new() {
+                maybeTanyao,
+            };
         }
 
-        // private YakuEligibility CheckTanyao(Dictionary<string, List<int>> suitToNumbers) {
-        //     return new(YakuDefinition.T);
-        // }
+        // TODO: kuitan is assumed enabled
+        public static YakuDefinition TANYAO_DEFINITION = new(true, YakuName.Tanyao, 1);
+        private YakuEligibility CheckTanyao(Dictionary<string, List<int>> suitToNumbers) {
+            var distance = 0;
+
+            if (suitToNumbers.ContainsKey(Suit.HONOR)) {
+                distance += suitToNumbers[Suit.HONOR].Count;
+            }
+
+            foreach (var suit in Suit.NOT_HONORS) {
+                if (!suitToNumbers.ContainsKey(suit)) {
+                    continue;
+                }
+                
+                distance += suitToNumbers[suit].Select(number => number == 1  || number == 9).Count();
+            }
+
+            return new(TANYAO_DEFINITION, distance);
+        }
     }
 }
