@@ -53,7 +53,6 @@ namespace GameModel
             var distance = 0;
 
             if (suitToNumbers.ContainsKey(Suit.HONOR)) {
-                Console.WriteLine("detected honor tiles");
                 distance += suitToNumbers[Suit.HONOR].Count;
             }
 
@@ -61,7 +60,6 @@ namespace GameModel
                 if (!suitToNumbers.ContainsKey(suit)) {
                     continue;
                 }
-                Console.WriteLine($"suit {suit} distiance {distance}");
                 distance += suitToNumbers[suit].Count(number => number == 1  || number == 9);
             }
 

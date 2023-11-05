@@ -10,123 +10,115 @@ namespace GameModel.Test {
         private YakuDetector yakuDetector = new YakuDetector();
         private ITestOutputHelper output;
 
-        public YakuDetectorTest(ITestOutputHelper xOutput) {
-            var converter = new Converter(xOutput);
-            Console.SetOut(converter);
-            output = xOutput;
-        }
+        public static IEnumerable<object[]> TanyaoData =>
+            new List<object[]>
+            {
+                new object[] {
+                    "No Honor Tiles (3)",
+                    new List<string>() { 
+                        "1z", 
+                        "1z", 
+                        "1z", 
 
-        [Fact]
-        public void TestTanyaoNoHonor()
-        {
-            var handList1 = new List<string>() { 
-                "1z", 
-                "1z", 
-                "1z", 
+                        "2m", 
+                        "2m", 
+                        "2m", 
 
-                "2m", 
-                "2m", 
-                "2m", 
+                        "3p", 
+                        "3p", 
+                        "3p", 
 
-                "3p", 
-                "3p", 
-                "3p", 
+                        "4s", 
+                        "4s", 
+                        "4s", 
 
-                "4s", 
-                "4s", 
-                "4s", 
+                        "8p", 
+                        "8p", 
+                    },
+                    3
+                },
 
-                "8p", 
-                "8p", 
+                new object[] {
+                    "No Terminal Tiles (1)",
+                    new List<string>() { 
+                        "2m", 
+                        "2m", 
+                        "2m", 
+                        "9m",
+
+                        "3p", 
+                        "3p", 
+                        "3p",
+                        "4p" ,
+
+                        "4s", 
+                        "4s", 
+                        "4s", 
+                        "5s",
+
+                        "8p", 
+                        "8p", 
+                    },
+                    1
+                },
+
+                new object[] {
+                    "No Terminal/Honor Tiles (5)",
+                    new List<string>() { 
+                        "1z", 
+                        "1z", 
+                        "1z", 
+                        "9m",
+
+                        "3p", 
+                        "3p", 
+                        "3p",
+                        "4p" ,
+
+                        "4s", 
+                        "4s", 
+                        "4s", 
+                        "9s",
+
+                        "8p", 
+                        "8p", 
+                    },
+                    5
+                },
+
+                new object[] {
+                    "Happy Path",
+                    new List<string>() { 
+                    "2m", 
+                    "2m", 
+                    "2m", 
+                    "5m",
+
+                    "3p", 
+                    "3p", 
+                    "3p",
+                    "4p" ,
+
+                    "4s", 
+                    "4s", 
+                    "4s", 
+                    "5s",
+
+                    "8p", 
+                    "8p", 
+                    },
+                    0
+                },
             };
-            var test1 = yakuDetector.GetYakuEligibility(handList1);
-            var tanyaoEligibility1 = test1.FirstOrDefault(el => el.Definition.Name == YakuName.Tanyao);
-            Assert.NotNull(tanyaoEligibility1);
-            Assert.Equal(3, tanyaoEligibility1.DistanceInTiles);
-        }
 
-        [Fact]
-        public void TestTanyaoNoTerminal()
-        {
-            var handList2 = new List<string>() { 
-                "2m", 
-                "2m", 
-                "2m", 
-                "9m",
 
-                "3p", 
-                "3p", 
-                "3p",
-                "4p" ,
-
-                "4s", 
-                "4s", 
-                "4s", 
-                "5s",
-
-                "8p", 
-                "8p", 
-            };
-            var test2 = yakuDetector.GetYakuEligibility(handList2);
-            var tanyaoEligibility2 = test2.FirstOrDefault(el => el.Definition.Name == YakuName.Tanyao);
-            Assert.NotNull(tanyaoEligibility2);
-            Assert.Equal(1, tanyaoEligibility2.DistanceInTiles);
-        }
-
-        [Fact]
-        public void TestTanyaoMix()
-        {
-            var handList2 = new List<string>() { 
-                "1z", 
-                "1z", 
-                "1z", 
-                "9m",
-
-                "3p", 
-                "3p", 
-                "3p",
-                "4p" ,
-
-                "4s", 
-                "4s", 
-                "4s", 
-                "9s",
-
-                "8p", 
-                "8p", 
-            };
-            var test2 = yakuDetector.GetYakuEligibility(handList2);
-            var tanyaoEligibility2 = test2.FirstOrDefault(el => el.Definition.Name == YakuName.Tanyao);
-            Assert.NotNull(tanyaoEligibility2);
-            Assert.Equal(5, tanyaoEligibility2.DistanceInTiles);
-        }
-
-        [Fact]
-        public void TestTanyaoHappy()
-        {
-            var handList2 = new List<string>() { 
-                "2m", 
-                "2m", 
-                "2m", 
-                "5m",
-
-                "3p", 
-                "3p", 
-                "3p",
-                "4p" ,
-
-                "4s", 
-                "4s", 
-                "4s", 
-                "5s",
-
-                "8p", 
-                "8p", 
-            };
-            var test2 = yakuDetector.GetYakuEligibility(handList2);
-            var tanyaoEligibility2 = test2.FirstOrDefault(el => el.Definition.Name == YakuName.Tanyao);
-            Assert.NotNull(tanyaoEligibility2);
-            Assert.Equal(0, tanyaoEligibility2.DistanceInTiles);
-        }
-    }    
+        [Theory()]
+        [MemberData(nameof(TanyaoData))]
+        public void TestTanyao(string label, List<string> tiles, int distance) {
+            var test1 = yakuDetector.GetYakuEligibility(tiles);
+            var eligibility = test1.FirstOrDefault(el => el.Definition.Name == YakuName.Tanyao);
+            Assert.NotNull(eligibility);
+            Assert.Equal(distance, eligibility.DistanceInTiles);   
+        }  
+    }
 }
